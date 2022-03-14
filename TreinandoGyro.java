@@ -1,19 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@TeleOp
-public class TeleOpFinal extends LinearOpMode {
+public class TreinandoGyro extends LinearOpMode {
     private DcMotor LMF;
     private DcMotor LMB;
     private DcMotor RMF;
     private DcMotor RMB;
-    private DcMotor esteira;
 
-    //private DcMotor ML;
+    BNO055IMU imu;
 
     double speed;
     boolean toggle = false;
@@ -23,15 +22,21 @@ public class TeleOpFinal extends LinearOpMode {
         LMB = hardwareMap.get(DcMotor.class, "LMB");
         RMF = hardwareMap.get(DcMotor.class, "RMF");
         RMB = hardwareMap.get(DcMotor.class, "RMB");
-        esteira = hardwareMap.get(DcMotor.class, "esteira");
-
-        //ML = hardwareMap.get(DcMotor.class, "ML");
         LMF.setDirection(DcMotorSimple.Direction.REVERSE);
         LMB.setDirection(DcMotorSimple.Direction.REVERSE);
         RMF.setDirection(DcMotorSimple.Direction.FORWARD);
         RMB.setDirection(DcMotorSimple.Direction.FORWARD);
-        esteira.setDirection(DcMotorSimple.Direction.FORWARD);
-        //ML.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         waitForStart();
 
@@ -51,9 +56,6 @@ public class TeleOpFinal extends LinearOpMode {
             double fME = 0;
             double forceMotorR = 0;
             double forceMotorL = 0;
-
-            double mlf = 0;
-
             //Control Speed
 
             // gamepad1.b ? speed = 1 : gamepad1.a ? speed = 1/2 : gamepad1.x ? speed = 1/4 ;
@@ -113,47 +115,10 @@ public class TeleOpFinal extends LinearOpMode {
                 forceMotorL = ((2 * sen2) + 1) * d2;
             }
             // 4º QUADRANTE
-            else if((x2 >= 0) && (y2 < 0)) {
+            else if((x2 >= 0 ) && (y2 < 0)) {
                 forceMotorR = ((2 * sen2) + 1) * d2;
                 forceMotorL = -d2;
             }
-
-            // força esteira
-            if(gamepad1.right_trigger > 0){
-                esteira.setPower(gamepad1.right_trigger);
-            }
-            else if(gamepad1.left_trigger > 0){
-                esteira.setPower(-gamepad1.left_trigger);
-            }
-
-            // Funções Linear
-            /*
-            if(!toggle) {
-                if(gamepad2.x) {
-                    mlf = 0.3;
-                    toggle = true;
-                }
-                if(gamepad2.a) {
-                    mlf = 0.5;
-                    toggle = true;
-                }
-                if(gamepad2.b) {
-                    mlf = 0.7;
-                    toggle = true;
-                }
-            } else if(!gamepad2.x && !gamepad2.a && !gamepad2.b) toggle = false;
-
-
-            if(gamepad2.dpad_up) {
-                ML.setPower(mlf);
-            }
-            else if(gamepad2.dpad_down){
-                ML.setPower(-mlf);
-            }
-
-            */
-
-            // Set Force
 
             if(fMD != 0 && fME != 0){
                 RMF.setPower(fMD * speed);
