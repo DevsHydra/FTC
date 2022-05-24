@@ -1,36 +1,36 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
-    import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-    import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-    import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-    import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-    import com.qualcomm.robotcore.hardware.CRServo;
-    import com.qualcomm.robotcore.hardware.DcMotor;
-    import com.qualcomm.robotcore.hardware.DcMotorSimple;
-    import com.qualcomm.robotcore.hardware.DigitalChannel;
-    import com.qualcomm.robotcore.hardware.DistanceSensor;
-    import com.qualcomm.robotcore.hardware.Servo;
-    import com.qualcomm.robotcore.hardware.TouchSensor;
-    import com.qualcomm.robotcore.util.ElapsedTime;
-    import com.qualcomm.robotcore.util.Range;
-    import com.qualcomm.robotcore.util.RobotLog;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.RobotLog;
 
-    import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-    import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-    import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-    import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-    import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-    import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-    import java.io.BufferedWriter;
-    import java.io.FileWriter;
-    import java.io.IOException;
-    import java.util.Date;
-    import java.util.Locale;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Locale;
 
 @Autonomous
-public class VermelhoDoisNivelPatoArm extends LinearOpMode {
+public class VermelhoDoisNivelPatoArm2 extends LinearOpMode {
     private DcMotor LMF;
     private DcMotor LMB;
     private DcMotor RMF;
@@ -45,7 +45,7 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     private CRServo SPR;
     private CRServo SPL;
 
-    HardwarePushbot         robot   = new HardwarePushbot();
+    HardwarePushbot robot = new HardwarePushbot();
 
     private Orientation lastAngles = new Orientation();
     private double currAngle = 0.0;
@@ -62,21 +62,13 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     double difTimer = 0;
     boolean objeto = false, temosObjeto = false;
     boolean controle = false;
-    int i =0;
+    int i = 0;
     String nivel = "";
-    double pointBraco =0;
-    double proporcional =0, integral = 0, derivada = 0, ultErro = 0, kP = 0, erro = 0;
+    double pointBraco = 0;
+    double proporcional = 0, integral = 0, derivada = 0, ultErro = 0, kP = 0, erro = 0;
     int posicion = 0;
-    double  MIN_PALETA = 0.2;
-    double  MAX_PALETA = 0.45;
-
-    double forcax = 0;
-    double forcax2 = 0;
-    double forcay = 0;
-    double angulofinalE;
-    double angulofinalD;
-    double angulorealE = 0;
-    double angulorealD = 0;s
+    double MIN_PALETA = 0.2;
+    double MAX_PALETA = 0.45;
 
 
     BNO055IMU imu;
@@ -84,11 +76,12 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     Orientation angles;
 
 
-    @Override public void runOpMode() {
+    @Override
+    public void runOpMode() {
 
         robot.init(hardwareMap);
 
-
+        boolean qqw = true;
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -101,7 +94,7 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
         digitalTouch = hardwareMap.get(DigitalChannel.class, "touch");
         digitalTouch.setMode(DigitalChannel.Mode.INPUT);
 
-        sensorDistance = hardwareMap.get(DistanceSensor.class,"sensor_color_distance");
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
 
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
@@ -164,46 +157,81 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
 
         telemetry.update();
 
-//  Vai para a identificação
+        //  Vai para a identificação
 
 
         SL.setPosition(MAX_PALETA);
         temosObjeto = true;
 
 
+        turnTo(0);
+        rlPower(0.75, -0.7);
+        MC.setPower(-1);
+        sleep(650);
+        turnTo(0);
 
-        seguirAngulo(500, 90);
+        MC.setPower(0);
+
+        //  Identifica
+        while (!objeto) {
+            if (controle) {
+                timer3 = timer;
+                controle = false;
+            }
+
+            allPower(0.3);
+            timer2 = getRuntime() - timer3;
+
+            telemetry.addData("Distancia -\t", String.format(Locale.US, "%02f", sensorDistance.getDistance(DistanceUnit.CM)));
+telemetry.update();
+
+            if (sensorDistance.getDistance(DistanceUnit.CM) <= 30 || timer2 >= 2.4) {
+                nivelObjet(timer2);
+                objeto = true;
+            }
+        }
+        allPower(0);
 
 
-//            allPower(0);
-//            sleep(100);
-//            turnToPID(0);
-//
-//            //  Identifica
-//            while (!objeto) {
-//                if (controle) {
-//                    timer3 = timer;
-//                    controle = false;
-//                }
-//
-//
-//                allPower(0.2);
-//                timer2 = getRuntime() - timer3;
-//
-//                telemetry.addData("Timer 2 - ", timer2);
-//                telemetry.addData("Distancia - ", sensorDistance.getDistance(DistanceUnit.CM));
-//                telemetry.update();
-//
-//                if (sensorDistance.getDistance(DistanceUnit.CM) <= 60 || timer2 >= 1.9) {
-//                    nivelObjet(timer2);
-//                    objeto = true;
-//                }
-//            }
-//
-//
-//            //          Movimentação ate o ShipHub
-//
-//
+//          Alinhar com ShipHub
+        if(nivel == "2"){
+            turnTo(230);
+        }else if(nivel == "1"){
+            turnTo(250);
+        }else if(nivel == "3"){
+            turnTo(270);
+        }
+
+//  Soltar carga
+        if(nivel == "2"){
+            allPower(0.2);
+            sleep(700);
+            allPower(0);
+
+        }else if(nivel == "1"){
+            allPower(0.2);
+            sleep(900);
+            allPower(0);
+
+        }else if(nivel == "3"){
+            allPower(0.2);
+            sleep(1700);
+            allPower(0);
+        }
+
+        setNivel(nivel);
+
+
+
+        while (objeto){
+            telemetry.addData("Nivel -", nivel);
+            telemetry.addData("Timer2 - ",timer2);
+            telemetry.update();
+        }
+
+
+
+
 //            if (objeto) {
 //
 //                if (nivel == "1") {
@@ -214,12 +242,12 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
 //                } else if (nivel == "2") {
 //
 //                    allPower(1);
-//                    sleep(200);
+//                    sleep(400);
 //
 //                } else if (nivel == "3") {
 //
 //                    allPower(1);
-//                    sleep(0);
+//                    sleep(150);
 //
 //                }
 //
@@ -228,49 +256,43 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
 //
 //                turnTo(270);
 //
-//                while (objeto){
-//                    telemetry.addData("Timer 2 - ", timer2);
-//                    telemetry.addData("Nivel -", nivel);
-//                    telemetry.update();
-//                }
-//            if(nivel == "1") {
-//                allPower(0.4);
-//                sleep(200);
-//            }else if(nivel == "2"){
-//                allPower(0.4);
-//                sleep(600);
-//            }else if(nivel == "3"){
-//                allPower(0.4);
-//                sleep(50);
-//            }
-
-            allPower(0);
-
-            //  Leva o braço até os níveis
-
-            //setNivel(nivel);
+        //            if(nivel == "1") {
+        //                allPower(0.4);
+        //                sleep(200);
+        //            }else if(nivel == "2"){
+        //                allPower(0.4);
+        //                sleep(600);
+        //            }else if(nivel == "3"){
+        //                allPower(0.4);
+        //                sleep(50);
+        //            }
 
 
+        //  Leva o braço até os níveis
 
-            //            nivel = "Coletar";
-            //            setNivel(nivel);
-            //
-            //            rlPower(1, -1);
-            //            sleep(1250);
-            //
-            //            turnTo(90);
-            //
-            //            allPower(0.2);
-            //            sleep(50);
-            //
-            //
-            //            //robot.SPR.setPower(1);
-            //            ML.setPower(1);
-            //            sleep(7000);
-            //            i++;
-            //
+        //setNivel(nivel);
+
+
+        //            nivel = "Coletar";
+        //            setNivel(nivel);
+        //
+        //            rlPower(1, -1);
+        //            sleep(1250);
+        //
+        //            turnTo(90);
+        //
+        //            allPower(0.2);
+        //            sleep(50);
+        //
+        //
+        //            //robot.SPR.setPower(1);
+        //            ML.setPower(1);
+        //            sleep(7000);
+        //            i++;
+        //
 
     }
+
 
 
     public void allPower(double forca){
@@ -303,13 +325,9 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     public String nivelObjet(double timer2){
 
         if(timer2 <= 1.4){
-            telemetry.addLine("Entrei nivel 2");
-            telemetry.update();
             return nivel = "2";
         }
-        else if(timer2>1.4 && timer2<1.9){
-            telemetry.addLine("Entrei nivel 1");
-            telemetry.update();
+        else if(timer2>1.4 && timer2<=2.38){
             return nivel = "1";
         }
         return nivel = "3";
@@ -317,7 +335,7 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     }
 
     public void setNivel(String nivel){
-        pointBraco = nivel == "Coletar" ? 0 : nivel == "1" ? 860 : nivel == "2" ? 795 : nivel == "3" ? 650 : pointBraco;
+        pointBraco = nivel == "Coletar" ? 0 : nivel == "3" ? 860 : nivel == "2" ? 795 : nivel == "1" ? 650 : pointBraco;
 
         runNivel(pointBraco, nivel);
     }
@@ -325,6 +343,7 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
     public void runNivel(double pointBraco, String nivel){
 
         int i=0;
+        double forca =-0.4;
         while (temosObjeto){
 
             telemetry.addData("Erro - ", erro);
@@ -350,18 +369,11 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
             ML.setTargetPosition(posicion);
             ML.setPower(1);
             ML.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            if(erro >= -8 && erro <= 8 && i > 1000){
 
-                if(nivel == "1") {
-                    allPower(-0.4);
-                    sleep(200);
-                }else if(nivel == "2"){
-                    allPower(-0.4);
-                    sleep(300);
-                }else if(nivel == "3"){
-                    allPower(-0.4);
-                    sleep(50);
-                }
+            if(erro >= -6 && erro <= 8 && i > 500){
+
+                allPower(forca);
+                sleep(300);
 
                 allPower(0);
 
@@ -371,10 +383,10 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
                 temosObjeto = false;
 
             }
-
             i++;
 
         }
+
 
     }
 
@@ -468,49 +480,6 @@ public class VermelhoDoisNivelPatoArm extends LinearOpMode {
             telemetry.update();
         }
         robot.setAllPower(0);
-    }
-
-    void seguirAngulo(double tempo, double angulo){
-
-        double anguloRobo;
-        double d = 0;
-        double fMD = 0, fME =0;
-        final double PI = Math.PI;
-
-        while(getRuntime() - timer < tempo){
-            anguloRobo = getAngle();
-            angulorealE = angulo - anguloRobo;
-
-            forcay = Math.sin(Math.toRadians(angulorealE)) * 0.5;
-            forcax = Math.cos(Math.toRadians(angulorealE)) * 0.5;
-
-            double angulorad = (d != 0) ? Math.asin(forcay / d) : 0;
-            if((forcax>= 0) && (forcay>=0)) {
-                fME = d;
-                fMD = (((4 / PI) * angulorad) - 1) * d;
-
-            }
-            //2º QUADRANTE FORÇA
-            else if ((forcax< 0) && (forcay>=0)) {
-                fME = (((4 / PI) * angulorad) - 1) * d;
-                fMD = d;
-            }
-            //3º QUADRANTE FORÇA
-            else if ((forcax< 0) && (forcay<0)) {
-                fME = -d;
-                fMD = (((4 / PI) * angulorad) + 1) * d ;
-            }
-            //4º QUADRANTE FORÇA
-            else if ((forcax>= 0) && (forcay<0)) {
-                fME = (((4 / PI) * angulorad) + 1) * d;
-                fMD = -d;
-            }
-
-            RMF.setPower(fMD);
-            LMF.setPower(fME);
-            RMB.setPower(fME);
-            LMB.setPower(fMD);
-        }
     }
 
 }
